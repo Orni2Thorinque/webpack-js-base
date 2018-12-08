@@ -1,34 +1,20 @@
-const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const fs = require('fs');
+
+const manifest = JSON.parse(fs.readFileSync('./manifest.json', 'utf8'));
 
 module.exports = {
-  entry: { main: './src/index.js' },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].[hash].js',
-  },
   watch: true,
   watchOptions: {
     aggregateTimeout: 300,
     poll: 1000,
     ignored: /node_modules/,
   },
-  devtool: 'source-map',
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-        },
-      },
-      {
-        test: /\.ts?$/,
-        loader: 'babel-loader',
-      },
       {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({
@@ -39,16 +25,17 @@ module.exports = {
     ],
   },
   plugins: [
+    new CleanWebpackPlugin('dist'),
     new ExtractTextPlugin({
-      filename: 'style.[hash].css',
+      filename: 'style.css',
       disable: false,
       allChunks: true,
     }),
     new HtmlWebpackPlugin({
-      inject: false,
-      hash: true,
+      inlineSource: '.(js|css)$',
       template: './src/index.html',
-      filename: 'index.html',
+      filename: `index-${manifest['version']}.html`,
     }),
+    new HtmlWebpackInlineSourcePlugin(),
   ],
 };

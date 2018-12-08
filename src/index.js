@@ -1,5 +1,5 @@
 import './style.css';
+import { initTimeout } from './timer';
+import { consoleGreet } from './utils';
 
-import { greet } from './greet';
-
-greet('Main greet'); 
+initTimeout('Alert greet timeout', consoleGreet('Simon'), 2000);
